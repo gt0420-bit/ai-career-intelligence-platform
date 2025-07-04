@@ -1,0 +1,139 @@
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import init_db, User, Agent, AgentTask, db
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+
+# Initialize extensions
+CORS(app)
+jwt = JWTManager(app)
+
+# Initialize database
+init_db(app)
+
+@app.route('/')
+def hello():
+    return jsonify({
+        "message": "🚀 Career Intelligence System API",
+        "status": "running",
+        "version": "1.0.0",
+        "agentic_system": "ready"
+    })
+
+@app.route('/api/health')
+def health_check():
+    try:
+        # Test database connection
+        agent_count = Agent.query.count()
+        user_count = User.query.count()
+        
+        return jsonify({
+            "status": "healthy",
+            "database": "connected",
+            "agents": agent_count,
+            "users": user_count,
+            "timestamp": "2024-12-19T10:30:00Z"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "database": "disconnected",
+            "error": str(e)
+        }), 500
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'error': 'Email already registered'}), 400
+    
+    user = User(
+        email=data['email'],
+        name=data['name'],
+        password_hash=generate_password_hash(data['password']),
+        skills=data.get('skills', []),
+        experience_level=data.get('experience_level', 'Mid')
+    )
+    
+    db.session.add(user)
+    db.session.commit()
+    
+    access_token = create_access_token(identity=user.id)
+    
+    return jsonify({
+        'message': 'User registered successfully',
+        'access_token': access_token,
+        'user_id': user.id
+    })
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(email=data['email']).first()
+    
+    if user and check_password_hash(user.password_hash, data['password']):
+        access_token = create_access_token(identity=user.id)
+        return jsonify({
+            'access_token': access_token,
+            'user_id': user.id,
+            'name': user.name
+        })
+    
+    return jsonify({'error': 'Invalid credentials'}), 401
+
+@app.route('/api/agents')
+def get_agents():
+    agents = Agent.query.all()
+    return jsonify([{
+        'id': agent.id,
+        'role': agent.agent_role.value,
+        'name': agent.name,
+        'is_active': agent.is_active
+    } for agent in agents])
+
+@app.route('/api/dashboard')
+@jwt_required()
+def dashboard():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Get recent tasks
+    recent_tasks = AgentTask.query.filter_by(user_id=user_id).order_by(
+        AgentTask.created_at.desc()
+    ).limit(10).all()
+    
+    return jsonify({
+        'user': {
+            'name': user.name,
+            'skills': user.skills,
+            'experience_level': user.experience_level,
+            'agentic_enabled': user.agentic_enabled
+        },
+        'recent_tasks': [{
+            'id': task.id,
+            'type': task.task_type,
+            'status': task.status.value,
+            'created_at': task.created_at.isoformat()
+        } for task in recent_tasks],
+        'stats': {
+            'total_tasks': len(recent_tasks),
+            'pending_tasks': len([t for t in recent_tasks if t.status.value == 'pending'])
+        }
+    })
+
+if __name__ == '__main__':
+    print("🚀 Starting Career Intelligence System...")
+    app.run(debug=True, host='0.0.0.0', port=5001)

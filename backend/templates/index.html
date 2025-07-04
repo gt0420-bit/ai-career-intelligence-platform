@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Intelligence System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .agent-card {
+            transition: all 0.3s ease;
+        }
+        .agent-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .agent-card.active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i data-lucide="brain" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold">Career Intelligence System</h1>
+                    <p class="text-blue-100">AI-powered career development platform</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Agent Selection -->
+            <div class="lg:col-span-1">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Select Agent</h2>
+                <div class="space-y-4">
+                    <!-- Skill Strategist -->
+                    <div class="agent-card bg-white rounded-lg shadow-md p-4 cursor-pointer border-2 border-transparent" 
+                         onclick="selectAgent('skill')" id="skill-card">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                                <i data-lucide="brain" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Skill Strategist</h3>
+                                <p class="text-sm text-gray-600">Analyze skill gaps and create learning roadmaps</p>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- Market Scout -->
+                    <div class="agent-card bg-white rounded-lg shadow-md p-4 cursor-pointer border-2 border-transparent" 
+                         onclick="selectAgent('market')" id="market-card">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Market Scout</h3>
+                                <p class="text-sm text-gray-600">Scan market trends and opportunities</p>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- Opportunity Hunter -->
+                    <div class="agent-card bg-white rounded-lg shadow-md p-4 cursor-pointer border-2 border-transparent" 
+                         onclick="selectAgent('opportunity')" id="opportunity-card">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                                <i data-lucide="target" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Opportunity Hunter</h3>
+                                <p class="text-sm text-gray-600">Discover hidden job opportunities</p>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form and Results -->
+            <div class="lg:col-span-2">
+                <!-- Agent Form -->
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div id="current-agent-icon" class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="brain" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <h2 id="current-agent-name" class="text-xl font-semibold text-gray-800">Skill Strategist</h2>
+                    </div>
+
+                    <!-- Forms -->
+                    <div id="skill-form" class="agent-form">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Current Skills (comma-separated)
+                                </label>
+                                <input type="text" id="currentSkills" placeholder="Python, JavaScript, SQL..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Target Role</label>
+                                <input type="text" id="targetRole" placeholder="Senior Software Engineer, Data Scientist..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Experience Level</label>
+                                    <select id="experience" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="beginner">Beginner</option>
+                                        <option value="intermediate" selected>Intermediate</option>
+                                        <option value="advanced">Advanced</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Timeline</label>
+                                    <select id="timeline" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="3 months">3 months</option>
+                                        <option value="6 months" selected>6 months</option>
+                                        <option value="1 year">1 year</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="market-form" class="agent-form hidden">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                                <input type="text" id="industry" placeholder="Technology, Finance, Healthcare..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Target Role</label>
+                                <input type="text" id="marketTargetRole" placeholder="Data Scientist, Product Manager..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <input type="text" id="location" placeholder="Remote, San Francisco, New York..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="opportunity-form" class="agent-form hidden">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Skills (comma-separated)</label>
+                                <input type="text" id="oppSkills" placeholder="Python, Machine Learning, Data Analysis..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Location Preference</label>
+                                <input type="text" id="oppLocation" placeholder="San Francisco, Remote, New York..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Salary</label>
+                                    <input type="number" id="salaryMin" placeholder="80000"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
+                                    <select id="companySize" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        <option value="">Any Size</option>
+                                        <option value="startup">Startup</option>
+                                        <option value="mid-size">Mid-size</option>
+                                        <option value="enterprise">Enterprise</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="remote" class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                    <span class="text-sm text-gray-700">Remote work preferred</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analyze Button -->
+                    <button onclick="analyzeAgent()" id="analyze-btn"
+                            class="w-full mt-6 gradient-bg text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
+                        <i data-lucide="play" class="w-4 h-4"></i>
+                        <span>Start Analysis</span>
+                    </button>
+                </div>
+
+                <!-- Results -->
+                <div id="results-container" class="hidden bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Analysis Results</h3>
+                        <div class="flex items-center space-x-4 text-sm text-gray-600">
+                            <span class="flex items-center">
+                                <i data-lucide="clock" class="w-4 h-4 mr-1"></i>
+                                <span id="execution-time">-</span>s
+                            </span>
+                            <span class="flex items-center">
+                                <i data-lucide="award" class="w-4 h-4 mr-1"></i>
+                                <span id="confidence">-</span>% confidence
+                            </span>
+                        </div>
+                    </div>
+                    <div id="results-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAgent = 'skill';
+
+        function selectAgent(agentType) {
+            console.log('Selecting agent:', agentType);
+            
+            // Remove active class from all cards
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Add active class to selected card
+            document.getElementById(agentType + '-card').classList.add('active');
+            
+            // Hide all forms
+            document.querySelectorAll('.agent-form').forEach(form => {
+                form.classList.add('hidden');
+            });
+            
+            // Show selected form
+            document.getElementById(agentType + '-form').classList.remove('hidden');
+            
+            // Update current agent
+            currentAgent = agentType;
+            
+            // Update agent name and icon
+            const agentInfo = {
+                skill: { name: 'Skill Strategist', icon: 'brain', color: 'bg-blue-500' },
+                market: { name: 'Market Scout', icon: 'trending-up', color: 'bg-green-500' },
+                opportunity: { name: 'Opportunity Hunter', icon: 'target', color: 'bg-purple-500' }
+            };
+            
+            document.getElementById('current-agent-name').textContent = agentInfo[agentType].name;
+            const iconElement = document.getElementById('current-agent-icon');
+            iconElement.className = `w-10 h-10 ${agentInfo[agentType].color} rounded-lg flex items-center justify-center`;
+            iconElement.innerHTML = `<i data-lucide="${agentInfo[agentType].icon}" class="w-5 h-5 text-white"></i>`;
+            
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+            
+            // Hide results
+            document.getElementById('results-container').classList.add('hidden');
+        }
+
+        async function analyzeAgent() {
+            console.log('Starting analysis for agent:', currentAgent);
+            
+            const button = document.getElementById('analyze-btn');
+            const resultsContainer = document.getElementById('results-container');
+            
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div><span>Analyzing...</span>';
+            
+            try {
+                let data = {};
+                let endpoint = '';
+                
+                if (currentAgent === 'skill') {
+                    endpoint = '/api/skill-analysis';
+                    data = {
+                        currentSkills: document.getElementById('currentSkills').value,
+                        targetRole: document.getElementById('targetRole').value,
+                        experience: document.getElementById('experience').value,
+                        timeline: document.getElementById('timeline').value
+                    };
+                } else if (currentAgent === 'market') {
+                    endpoint = '/api/market-analysis';
+                    data = {
+                        industry: document.getElementById('industry').value,
+                        targetRole: document.getElementById('marketTargetRole').value,
+                        location: document.getElementById('location').value
+                    };
+                } else if (currentAgent === 'opportunity') {
+                    endpoint = '/api/opportunity-discovery';
+                    data = {
+                        currentSkills: document.getElementById('oppSkills').value,
+                        location: document.getElementById('oppLocation').value,
+                        preferences: {
+                            salaryMin: document.getElementById('salaryMin').value,
+                            companySize: document.getElementById('companySize').value,
+                            remote: document.getElementById('remote').checked
+                        }
+                    };
+                }
+                
+                console.log('Making request to:', endpoint);
+                console.log('With data:', data);
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                if (result.success !== false) {
+                    displayResults(result);
+                    resultsContainer.classList.remove('hidden');
+                } else {
+                    alert('Analysis failed: ' + (result.error || 'Unknown error'));
+                }
+                
+            } catch (error) {
+                console.error('Error details:', error);
+                alert('Network error occurred: ' + error.message);
+            } finally {
+                // Reset button
+                button.disabled = false;
+                button.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i><span>Start Analysis</span>';
+                lucide.createIcons();
+            }
+        }
+
+        function displayResults(result) {
+            document.getElementById('execution-time').textContent = (result.execution_time || 0).toFixed(2);
+            document.getElementById('confidence').textContent = result.confidence || 0;
+            
+            const content = document.getElementById('results-content');
+            
+            if (result.success !== false) {
+                content.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                            <span class="text-green-800 font-medium">Analysis completed successfully!</span>
+                        </div>
+                        <div class="mt-3 text-sm text-green-700">
+                            <pre class="whitespace-pre-wrap bg-white p-3 rounded border overflow-auto max-h-96">${JSON.stringify(result, null, 2)}</pre>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="alert-circle" class="w-5 h-5 text-red-600"></i>
+                            <span class="text-red-800 font-medium">Analysis failed</span>
+                        </div>
+                        <div class="mt-2 text-sm text-red-700">${result.error || 'Unknown error occurred'}</div>
+                    </div>
+                `;
+            }
+            
+            lucide.createIcons();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+            selectAgent('skill');
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

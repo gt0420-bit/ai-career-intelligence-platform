@@ -1,0 +1,457 @@
+import React, { useState, useEffect } from 'react';
+import Header from './components/Layout/Header';
+import Navigation from './components/Layout/Navigation';
+import { JobService } from './services/api/jobService';
+import { SkillService } from './services/api/skillService';
+import { SalaryService } from './services/api/salaryService';
+import { ChatService } from './services/llm/chatService';
+import { mockUserProfile } from './services/data/mockData';
+import { TrendingUp, Star, Briefcase, Bot, Send, Loader2, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
+import MigrationAnalytics from './components/Migration/MigrationAnalytics';
+import './index.css';
+
+const JobCard = ({ job }) => (
+  <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-xl font-bold text-gray-800">{job.title}</h3>
+        <p className="text-gray-600">{job.company}</p>
+        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+          <span className="flex items-center gap-1">
+            <MapPin size={16} />
+            {job.location}
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock size={16} />
+            {job.posted}
+          </span>
+          {job.remote && (
+            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
+              Remote
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">
+        {job.match}% Match
+      </div>
+    </div>
+    
+    <div className="mb-4">
+      <div className="flex items-center gap-2 mb-3">
+        <DollarSign size={16} className="text-green-600" />
+        <span className="font-semibold text-green-600">{job.salary}</span>
+      </div>
+      {job.skills && job.skills.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {job.skills.map(skill => (
+            <span key={skill} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
+              {skill}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+    
+    <div className="flex gap-2">
+      <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+        View Details
+      </button>
+      {job.applyUrl && (
+        <a href={job.applyUrl} target="_blank" rel="noopener noreferrer"
+           className="flex items-center gap-2 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
+          Apply <ExternalLink size={16} />
+        </a>
+      )}
+    </div>
+  </div>
+);
+
+const Dashboard = ({ userProfile, realData, loading }) => {
+  console.log('Dashboard realData:', realData);
+  
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 text-center">
+        <Loader2 className="animate-spin mx-auto mb-4" size={32} />
+        <p className="text-gray-600">Loading real career data...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Market Position</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {realData.salaryData?.marketPosition || 'Loading...'}
+              </p>
+              <p className="text-sm text-gray-500">
+                {realData.salaryData?.demand || 'High'} demand
+              </p>
+            </div>
+            <TrendingUp className="text-green-600" size={24} />
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Market Salary</p>
+              <p className="text-2xl font-bold text-gray-800">
+                ${realData.salaryData?.current?.toLocaleString() || 'Loading...'}
+              </p>
+              <p className="text-sm text-green-600">
+                +{realData.salaryData?.growth || 12}% growth
+              </p>
+            </div>
+            <Star className="text-yellow-500" size={24} />
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Job Matches</p>
+              <p className="text-2xl font-bold text-gray-800">{realData.jobCount || 'Loading...'}</p>
+              <p className="text-sm text-gray-500">Available positions</p>
+            </div>
+            <Briefcase className="text-blue-600" size={24} />
+          </div>
+        </div>
+      </div>
+
+      {realData.skillGaps?.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">High-Demand Skills to Learn</h2>
+          <div className="space-y-3">
+            {realData.skillGaps.slice(0, 5).map(gap => (
+              <div key={gap.skill} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <span className="font-medium text-gray-800">{gap.skill}</span>
+                  <p className="text-sm text-gray-600">+${gap.avgSalaryBoost?.toLocaleString()} avg impact</p>
+                </div>
+                <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+                  {gap.demand}% demand
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <h3 className="font-medium text-yellow-800 mb-2">🔧 Debug Info:</h3>
+        <p className="text-sm text-yellow-700">Jobs loaded: {realData.jobs?.length || 0}</p>
+        <p className="text-sm text-yellow-700">Salary data: {realData.salaryData ? '✅ Loaded' : '❌ Missing'}</p>
+        <p className="text-sm text-yellow-700">Skill gaps: {realData.skillGaps?.length || 0}</p>
+        <p className="text-sm text-yellow-700">Loading state: {loading ? 'Yes' : 'No'}</p>
+      </div>
+    </div>
+  );
+};
+
+const JobList = ({ realJobs, loading, error }) => {
+  console.log('JobList realJobs:', realJobs);
+  console.log('JobList loading:', loading);
+  
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 text-center">
+        <Loader2 className="animate-spin mx-auto mb-4" size={32} />
+        <p className="text-gray-600">Loading job recommendations...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 text-center">
+        <div className="bg-red-50 border border-red-200 rounded p-4">
+          <p className="text-red-700">❌ {error}</p>
+          <p className="text-sm text-red-600 mt-2">Check your RapidAPI key and subscription</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-800">Job Recommendations</h2>
+        <div className="text-sm text-gray-600">
+          {realJobs?.length || 0} positions found
+        </div>
+      </div>
+      
+      {realJobs && realJobs.length > 0 ? (
+        <div className="space-y-4">
+          {realJobs.map(job => (
+            <JobCard key={job.id} job={job} />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <Briefcase className="mx-auto mb-4 text-gray-400" size={48} />
+          <p className="text-gray-600">
+            {realJobs === null ? 'Loading job data...' : 'No job matches found.'}
+          </p>
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <p className="text-blue-700 text-sm">
+              💡 This might be due to API rate limits or subscription issues.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ChatAgent = ({ userProfile, realData }) => {
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatService] = useState(() => new ChatService());
+
+  useEffect(() => {
+    const welcomeText = realData.jobs?.length > 0 ? 
+      `Hi ${userProfile.name}! I found ${realData.jobs.length} job opportunities that match your profile. Your market position looks ${realData.salaryData?.marketPosition?.toLowerCase() || 'strong'}. What would you like to explore?` :
+      `Hi ${userProfile.name}! I'm analyzing the job market for you. Ask me about career opportunities, skills, or salary insights!`;
+
+    setMessages([{
+      id: 1,
+      sender: 'agent',
+      text: welcomeText,
+      timestamp: new Date()
+    }]);
+  }, [userProfile, realData]);
+
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isLoading) return;
+    
+    const userMessage = {
+      id: Date.now(),
+      sender: 'user',
+      text: inputMessage.trim(),
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+    
+    try {
+      const response = await chatService.generateResponse(
+        inputMessage.trim(), 
+        userProfile, 
+        realData
+      );
+      
+      const responseMessage = {
+        id: Date.now() + 1,
+        sender: 'agent',
+        text: response,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, responseMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        sender: 'agent',
+        text: "I'm having trouble connecting to my AI service. Let me give you some general career advice instead!",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md h-[600px] flex flex-col">
+      <div className="p-4 border-b bg-blue-50 rounded-t-lg">
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-600 text-white p-2 rounded-full">
+            <Bot size={20} />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-800">Career Agent</h3>
+            <p className="text-sm text-gray-600">AI-powered with real market data</p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map(message => (
+          <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-xs p-3 rounded-lg ${
+              message.sender === 'user' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 text-gray-800'
+            }`}>
+              <p className="text-sm">{message.text}</p>
+            </div>
+          </div>
+        ))}
+        
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-gray-100 text-gray-800 max-w-xs p-3 rounded-lg flex items-center gap-2">
+              <Loader2 size={16} className="animate-spin" />
+              <span className="text-sm">Thinking...</span>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      <div className="p-4 border-t">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Ask: 'How many jobs did you find?'"
+            className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isLoading}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!inputMessage.trim() || isLoading}
+            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            <Send size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [userProfile] = useState(mockUserProfile);
+  const [realData, setRealData] = useState({
+    jobs: null,
+    salaryData: null,
+    skillGaps: null,
+    jobCount: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [jobService] = useState(() => new JobService());
+  const [skillService] = useState(() => new SkillService());
+  const [salaryService] = useState(() => new SalaryService());
+
+  useEffect(() => {
+    const loadRealData = async () => {
+      console.log('🔄 Starting to load real data...');
+      
+      try {
+        setLoading(true);
+        setError(null);
+        
+        console.log('📡 Calling job service...');
+        const jobs = await jobService.getJobRecommendations(userProfile);
+        console.log('📊 Jobs received:', jobs);
+        
+        console.log('💰 Calling salary service...');
+        const salaryData = await salaryService.getSalaryData(
+          userProfile.role, 
+          userProfile.location, 
+          userProfile.experience
+        );
+        console.log('💰 Salary data received:', salaryData);
+        
+        console.log('🎯 Calling skill service...');
+        const skillGaps = await skillService.analyzeSkillGaps(
+          userProfile.skills, 
+          userProfile.role
+        );
+        console.log('🎯 Skill gaps received:', skillGaps);
+
+        setRealData({
+          jobs: jobs || [],
+          salaryData: salaryData,
+          skillGaps: skillGaps || [],
+          jobCount: (jobs || []).length
+        });
+        
+        console.log('✅ All data loaded successfully!');
+      } catch (error) {
+        console.error('❌ Failed to load real data:', error);
+        setError('Unable to load market data. Check your API keys.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRealData();
+  }, [userProfile, jobService, skillService, salaryService]);
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard userProfile={userProfile} realData={realData} loading={loading} />;
+      case 'jobs':
+        return <JobList realJobs={realData.jobs} loading={loading} error={error} />;
+      case 'skills':
+        return (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">Skill Analysis</h2>
+            {realData.skillGaps && realData.skillGaps.length > 0 ? (
+              <div className="space-y-3">
+                {realData.skillGaps.map(gap => (
+                  <div key={gap.skill} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span className="font-medium">{gap.skill}</span>
+                    <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
+                      {gap.demand}% demand
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-600">Loading skill analysis...</p>
+            )}
+          </div>
+        );
+      case 'learning':
+        return (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">Learning Paths</h2>
+            <p>Discover courses and certifications to advance your career.</p>
+          </div>
+        );
+      default:
+        return <Dashboard userProfile={userProfile} realData={realData} loading={loading} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header userProfile={userProfile} />
+      
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3">
+            <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="mt-6">
+              {renderActiveTab()}
+            </div>
+          </div>
+          <div className="lg:col-span-1">
+            <ChatAgent userProfile={userProfile} realData={realData} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
