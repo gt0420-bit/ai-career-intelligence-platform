@@ -1,7 +1,7 @@
 # AI-Powered Career Intelligence System
 ## Capstone Project Report
 
-**Author:** [Your Name]  
+**Author:** Gautham Tanikella  
 **Date:** August 16, 2025  
 **Institution:** [Your Institution]  
 **Program:** [Your Program/Degree]
