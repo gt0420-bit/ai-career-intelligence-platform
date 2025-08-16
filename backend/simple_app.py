@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template_string
+from flask import Flask, jsonify, render_template_string, render_template
 import json
 
 app = Flask(__name__)
@@ -82,6 +82,24 @@ HTML = '''
 def home():
     return render_template_string(HTML)
 
+@app.route('/ai-test')
+def ai_test():
+    return render_template('ai_test.html')
+
+@app.route('/precision-dashboard')
+def precision_dashboard():
+    return render_template('precision_career_dashboard.html')
+
+# Register precision career API endpoints
+try:
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from api.precision_career_endpoints import precision_bp
+    app.register_blueprint(precision_bp, url_prefix='/api/precision')
+    print("✅ Precision Career Intelligence endpoints registered")
+except Exception as e:
+    print(f"⚠️ Could not register Precision Career endpoints: {e}")
 @app.route('/analyze', methods=['POST'])
 def analyze():
     print("🔍 Starting comprehensive agent analysis...")

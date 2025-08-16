@@ -1,0 +1,182 @@
+{
+  "test_timestamp": "2025-08-16T02:59:04.290830",
+  "test_duration": 0.30226802825927734,
+  "import_results": {
+    "langchain_import": true,
+    "crewai_import": true,
+    "vector_db_import": true,
+    "llamaindex_import": false,
+    "workflows_import": false
+  },
+  "status_results": {
+    "langchain_status": {
+      "langchain_available": true,
+      "openai_available": true,
+      "chromadb_available": true,
+      "application_data_loaded": 266,
+      "tools_available": 0,
+      "agent_initialized": false,
+      "vector_store_initialized": true
+    },
+    "crewai_status": {
+      "crewai_available": true,
+      "langchain_available": true,
+      "openai_available": true,
+      "application_data_loaded": 266,
+      "agents_initialized": false,
+      "llm_configured": false,
+      "agents_available": []
+    },
+    "vector_status": {
+      "chromadb_available": true,
+      "openai_available": true,
+      "database_initialized": true,
+      "total_applications_loaded": 266,
+      "collections": {
+        "applications": 50,
+        "companies": 0,
+        "skills": 0
+      },
+      "database_path": "./career_vector_db"
+    }
+  },
+  "component_results": {
+    "langchain": {
+      "success": false,
+      "response_time": 5.9604644775390625e-06,
+      "result": {
+        "success": false,
+        "error": "No AI API available",
+        "analysis": "Please configure OpenAI API key"
+      }
+    },
+    "crewai": {
+      "success": false,
+      "response_time": 5.245208740234375e-06,
+      "result": {
+        "success": false,
+        "error": "No AI API available",
+        "analysis": "Please configure OpenAI API key"
+      }
+    },
+    "vector_db": {
+      "success": true,
+      "response_time": 0.2991170883178711,
+      "results_count": 3,
+      "result": [
+        {
+          "id": "app_428",
+          "title": "Position (from email)",
+          "company": "Simon Data Hiring Team",
+          "status": "APPLIED",
+          "success": false,
+          "location": "",
+          "salary_min": 0,
+          "document_snippet": "Position: Position (from email) | Company: Simon Data Hiring Team | Notes: From: Simon Data Hiring Team <no-reply@ashbyhq.com>...\nSubject: Thank you for your interest in Simon Data......",
+          "similarity_score": -0.08274877071380615,
+          "search_type": "semantic_vector"
+        },
+        {
+          "id": "app_571",
+          "title": "Engineering Manager, Data Products",
+          "company": "Garner Health",
+          "status": "APPLIED",
+          "success": false,
+          "location": "NYC (Hybrid)",
+          "salary_min": 0,
+          "document_snippet": "Position: Engineering Manager, Data Products | Company: Garner Health | Location: NYC (Hybrid) | Notes: Opportunity from Rebecca Scherff at Garner Health. Engineering Manager role for Data Products te...",
+          "similarity_score": -0.23441863059997559,
+          "search_type": "semantic_vector"
+        },
+        {
+          "id": "app_476",
+          "title": "Position with details (from email)",
+          "company": "LinkedIn",
+          "status": "APPLIED",
+          "success": false,
+          "location": "",
+          "salary_min": 0,
+          "document_snippet": "Position: Position with details (from email) | Company: LinkedIn | Notes: From: LinkedIn <jobs-noreply@linkedin.com>...\nSubject: Your application to Lead Mulesoft Integration Engi......",
+          "similarity_score": -0.25065767765045166,
+          "search_type": "semantic_vector"
+        }
+      ]
+    }
+  },
+  "workflow_results": {},
+  "capability_results": {
+    "success": false,
+    "error": "name 'get_system_capabilities' is not defined"
+  },
+  "performance_report": {
+    "component_results": {
+      "langchain": {
+        "success": false,
+        "response_time": 5.9604644775390625e-06,
+        "result": {
+          "success": false,
+          "error": "No AI API available",
+          "analysis": "Please configure OpenAI API key"
+        }
+      },
+      "crewai": {
+        "success": false,
+        "response_time": 5.245208740234375e-06,
+        "result": {
+          "success": false,
+          "error": "No AI API available",
+          "analysis": "Please configure OpenAI API key"
+        }
+      },
+      "vector_db": {
+        "success": true,
+        "response_time": 0.2991170883178711,
+        "results_count": 3,
+        "result": [
+          {
+            "id": "app_428",
+            "title": "Position (from email)",
+            "company": "Simon Data Hiring Team",
+            "status": "APPLIED",
+            "success": false,
+            "location": "",
+            "salary_min": 0,
+            "document_snippet": "Position: Position (from email) | Company: Simon Data Hiring Team | Notes: From: Simon Data Hiring Team <no-reply@ashbyhq.com>...\nSubject: Thank you for your interest in Simon Data......",
+            "similarity_score": -0.08274877071380615,
+            "search_type": "semantic_vector"
+          },
+          {
+            "id": "app_571",
+            "title": "Engineering Manager, Data Products",
+            "company": "Garner Health",
+            "status": "APPLIED",
+            "success": false,
+            "location": "NYC (Hybrid)",
+            "salary_min": 0,
+            "document_snippet": "Position: Engineering Manager, Data Products | Company: Garner Health | Location: NYC (Hybrid) | Notes: Opportunity from Rebecca Scherff at Garner Health. Engineering Manager role for Data Products te...",
+            "similarity_score": -0.23441863059997559,
+            "search_type": "semantic_vector"
+          },
+          {
+            "id": "app_476",
+            "title": "Position with details (from email)",
+            "company": "LinkedIn",
+            "status": "APPLIED",
+            "success": false,
+            "location": "",
+            "salary_min": 0,
+            "document_snippet": "Position: Position with details (from email) | Company: LinkedIn | Notes: From: LinkedIn <jobs-noreply@linkedin.com>...\nSubject: Your application to Lead Mulesoft Integration Engi......",
+            "similarity_score": -0.25065767765045166,
+            "search_type": "semantic_vector"
+          }
+        ]
+      }
+    },
+    "workflow_results": {},
+    "working_components": [
+      "vector_db"
+    ],
+    "success_rate": 0.3333333333333333,
+    "recommended_workflow": "quick"
+  }
+}

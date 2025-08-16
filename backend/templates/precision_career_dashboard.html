@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎯 Precision Career Intelligence Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .result-box { max-height: 600px; overflow-y: auto; }
+        .loading { display: none; }
+        .loading.show { display: inline-block; }
+        .success-metric { background: linear-gradient(135deg, #10b981, #34d399); }
+        .transition-path { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+        .precision-app { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen p-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">🎯 Precision Career Intelligence</h1>
+            <p class="text-xl text-gray-600">Advanced AI-powered career transition analysis with unprecedented accuracy</p>
+            <div class="mt-4 flex justify-center space-x-4 text-sm">
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">✅ Jobright.ai Integration</span>
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full">✅ ATS Optimization (Jobscan)</span>
+                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full">✅ Multi-Agent AI System</span>
+                <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full">✅ Historical Pattern Analysis</span>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">🚀 Precision Career Analysis</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- User Profile -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-700 mb-4">👤 Your Profile</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Current Role:</label>
+                            <input type="text" id="current-role" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="e.g., Senior Software Engineer" value="Senior Software Engineer">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Skills (comma-separated):</label>
+                            <input type="text" id="skills" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="e.g., Python, Machine Learning, Leadership" 
+                                   value="Python, Machine Learning, System Design, Leadership, Data Analysis">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Experience (years):</label>
+                            <input type="number" id="experience-years" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="e.g., 6" value="7">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Industry:</label>
+                            <select id="industry" class="w-full p-3 border border-gray-300 rounded-lg">
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Consulting">Consulting</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Career Goals -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-700 mb-4">🎯 Career Goals</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Target Companies:</label>
+                            <input type="text" id="target-companies" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="e.g., Google, Amazon, Microsoft" value="Google, Amazon, Microsoft">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Target Roles:</label>
+                            <input type="text" id="target-roles" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="e.g., Product Manager, Engineering Manager" 
+                                   value="Product Manager, Engineering Manager">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Timeline (months):</label>
+                            <input type="number" id="timeline" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="e.g., 12" value="12">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Target Salary Increase:</label>
+                            <select id="salary-increase" class="w-full p-3 border border-gray-300 rounded-lg">
+                                <option value="0.15">15%</option>
+                                <option value="0.20">20%</option>
+                                <option value="0.25" selected>25%</option>
+                                <option value="0.30">30%</option>
+                                <option value="0.40">40%+</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 text-center">
+                <button onclick="runPrecisionAnalysis()" 
+                        class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition mr-4">
+                    🎯 Run Precision Analysis
+                </button>
+                <button onclick="getTransitionPaths()" 
+                        class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition">
+                    🔄 Analyze Transition Paths
+                </button>
+                <div class="loading mt-4">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <span class="ml-2 text-lg">Analyzing with advanced AI...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden">
+            <!-- Success Metrics -->
+            <div id="success-metrics" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">📊 Success Metrics</h3>
+                <div id="metrics-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            </div>
+
+            <!-- Transition Intelligence -->
+            <div id="transition-intelligence" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">🧠 Transition Intelligence</h3>
+                <div id="transition-content"></div>
+            </div>
+
+            <!-- Precision Applications -->
+            <div id="precision-applications" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">🎯 Precision Applications</h3>
+                <div id="applications-content"></div>
+            </div>
+
+            <!-- Execution Plan -->
+            <div id="execution-plan" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">📋 Strategic Execution Plan</h3>
+                <div id="execution-content"></div>
+            </div>
+
+            <!-- Competitive Advantages -->
+            <div id="competitive-advantages" class="bg-white rounded-xl shadow-lg p-6 hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">🚀 Your Competitive Advantages</h3>
+                <div id="advantages-content"></div>
+            </div>
+        </div>
+
+        <!-- Transition Paths Results -->
+        <div id="transition-paths-results" class="hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">🔄 Career Transition Paths</h3>
+                <div id="paths-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Main precision analysis function
+        async function runPrecisionAnalysis() {
+            const loading = document.querySelector('.loading');
+            const resultsSection = document.getElementById('results-section');
+            
+            // Show loading
+            loading.classList.add('show');
+            resultsSection.classList.add('hidden');
+            
+            // Hide individual result sections
+            hideAllResultSections();
+            
+            try {
+                const payload = {
+                    user_profile: {
+                        current_role: document.getElementById('current-role').value,
+                        skills: document.getElementById('skills').value.split(',').map(s => s.trim()),
+                        experience_years: parseInt(document.getElementById('experience-years').value),
+                        industry: document.getElementById('industry').value,
+                        company: "Current Company"
+                    },
+                    career_goals: {
+                        target_companies: document.getElementById('target-companies').value.split(',').map(s => s.trim()),
+                        target_roles: document.getElementById('target-roles').value.split(',').map(s => s.trim()),
+                        timeline_months: parseInt(document.getElementById('timeline').value),
+                        salary_increase_target: parseFloat(document.getElementById('salary-increase').value)
+                    }
+                };
+                
+                console.log('Sending payload:', payload);
+                
+                const response = await fetch('/api/precision/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const results = await response.json();
+                console.log('Received results:', results);
+                
+                // Display results
+                displayPrecisionResults(results);
+                resultsSection.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error running precision analysis:', error);
+                alert(`Analysis failed: ${error.message}`);
+            }
+            
+            loading.classList.remove('show');
+        }
+
+        // Get transition paths
+        async function getTransitionPaths() {
+            const loading = document.querySelector('.loading');
+            
+            loading.classList.add('show');
+            
+            try {
+                const payload = {
+                    user_profile: {
+                        current_role: document.getElementById('current-role').value,
+                        skills: document.getElementById('skills').value.split(',').map(s => s.trim()),
+                        experience_years: parseInt(document.getElementById('experience-years').value)
+                    },
+                    preferences: {
+                        target_companies: document.getElementById('target-companies').value.split(',').map(s => s.trim())
+                    }
+                };
+                
+                const response = await fetch('/api/precision/transition-paths', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const results = await response.json();
+                displayTransitionPaths(results);
+                document.getElementById('transition-paths-results').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error getting transition paths:', error);
+                alert(`Failed to get transition paths: ${error.message}`);
+            }
+            
+            loading.classList.remove('show');
+        }
+
+        // Display precision analysis results
+        function displayPrecisionResults(results) {
+            // Success Metrics
+            if (results.success_metrics) {
+                displaySuccessMetrics(results.success_metrics);
+                document.getElementById('success-metrics').classList.remove('hidden');
+            }
+            
+            // Transition Intelligence
+            if (results.transition_intelligence) {
+                displayTransitionIntelligence(results.transition_intelligence);
+                document.getElementById('transition-intelligence').classList.remove('hidden');
+            }
+            
+            // Precision Applications
+            if (results.precision_applications) {
+                displayPrecisionApplications(results.precision_applications);
+                document.getElementById('precision-applications').classList.remove('hidden');
+            }
+            
+            // Execution Plan
+            if (results.execution_plan) {
+                displayExecutionPlan(results.execution_plan);
+                document.getElementById('execution-plan').classList.remove('hidden');
+            }
+            
+            // Competitive Advantages
+            if (results.competitive_advantages) {
+                displayCompetitiveAdvantages(results.competitive_advantages);
+                document.getElementById('competitive-advantages').classList.remove('hidden');
+            }
+        }
+
+        function displaySuccessMetrics(metrics) {
+            const grid = document.getElementById('metrics-grid');
+            grid.innerHTML = '';
+            
+            Object.entries(metrics).forEach(([key, value]) => {
+                const metricDiv = document.createElement('div');
+                metricDiv.className = 'success-metric text-white p-4 rounded-lg text-center';
+                metricDiv.innerHTML = `
+                    <div class="text-2xl font-bold">${value}</div>
+                    <div class="text-sm opacity-90">${key.replace(/_/g, ' ').toUpperCase()}</div>
+                `;
+                grid.appendChild(metricDiv);
+            });
+        }
+
+        function displayTransitionIntelligence(intelligence) {
+            const content = document.getElementById('transition-content');
+            
+            const topTransition = intelligence.top_transition;
+            if (topTransition) {
+                content.innerHTML = `
+                    <div class="transition-path text-white p-6 rounded-lg mb-4">
+                        <h4 class="text-xl font-bold mb-2">🎯 Top Recommended Transition</h4>
+                        <div class="text-lg">${topTransition.from_role} → ${topTransition.to_role} at ${topTransition.target_company}</div>
+                        <div class="mt-2 text-sm opacity-90">Success Probability: ${(topTransition.success_probability * 100).toFixed(0)}% | Timeline: ${topTransition.timeline_months} months</div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 text-center">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600">${intelligence.paths_analyzed}</div>
+                            <div class="text-sm text-gray-600">Paths Analyzed</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600">${intelligence.strategic_transitions.length}</div>
+                            <div class="text-sm text-gray-600">Strategic Options</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-purple-600">${(topTransition.success_probability * 100).toFixed(0)}%</div>
+                            <div class="text-sm text-gray-600">Top Success Rate</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayPrecisionApplications(applications) {
+            const content = document.getElementById('applications-content');
+            
+            if (applications.length === 0) {
+                content.innerHTML = '<p class="text-gray-500">No precision applications generated.</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            applications.forEach((app, index) => {
+                html += `
+                    <div class="precision-app text-white p-6 rounded-lg mb-4">
+                        <h4 class="text-xl font-bold mb-2">Application ${index + 1}: ${app.job.title} at ${app.job.company}</h4>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <div class="opacity-90">Success Prediction: ${(app.success_prediction * 100).toFixed(0)}%</div>
+                                <div class="opacity-90">Strategic Value: ${(app.strategic_value * 100).toFixed(0)}%</div>
+                                <div class="opacity-90">ATS Score: ${(app.optimized_materials.ats_score * 100).toFixed(0)}%</div>
+                            </div>
+                            <div>
+                                <div class="opacity-90">Job Match: ${(app.job.match_percentage * 100).toFixed(0)}%</div>
+                                <div class="opacity-90">Location: ${app.job.location}</div>
+                                <div class="opacity-90">Salary: ${app.job.salary_range}</div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-sm opacity-90">
+                            <strong>Strategy:</strong> ${app.ai_strategy.application_approach}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+        }
+
+        function displayExecutionPlan(plan) {
+            const content = document.getElementById('execution-content');
+            
+            content.innerHTML = `
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg mb-4">
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">📅 Immediate Action Plan</h4>
+                    <div class="text-gray-700">
+                        <div><strong>Timeline:</strong> ${plan.immediate_action.timeline}</div>
+                        <div><strong>Focus:</strong> ${plan.immediate_action.focus}</div>
+                        <div class="mt-2"><strong>Priority Applications:</strong> ${plan.immediate_action.applications}</div>
+                    </div>
+                    <div class="mt-3">
+                        <h5 class="font-bold text-gray-800">Next Actions:</h5>
+                        <ul class="list-disc list-inside text-sm text-gray-600 mt-1">
+                            ${plan.immediate_action.actions.map(action => `<li>${action}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h5 class="font-bold text-gray-800 mb-2">🎯 Success KPIs</h5>
+                        <ul class="text-sm text-gray-600">
+                            ${plan.success_tracking_kpis.map(kpi => `<li>• ${kpi}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h5 class="font-bold text-gray-800 mb-2">📅 Weekly Schedule</h5>
+                        <div class="text-sm text-gray-600">
+                            ${Object.entries(plan.weekly_schedule).map(([week, tasks]) => 
+                                `<div class="mb-2"><strong>${week}:</strong> ${tasks.join(', ')}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayCompetitiveAdvantages(advantages) {
+            const content = document.getElementById('advantages-content');
+            
+            const html = advantages.map(advantage => `
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-3 border-l-4 border-blue-500">
+                    <div class="text-gray-800">✅ ${advantage}</div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = html;
+        }
+
+        function displayTransitionPaths(results) {
+            const content = document.getElementById('paths-content');
+            
+            if (!results.transition_paths || results.transition_paths.length === 0) {
+                content.innerHTML = '<p class="text-gray-500">No transition paths found.</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            results.transition_paths.forEach((path, index) => {
+                html += `
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg mb-6 border border-blue-200">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-3">
+                            ${index + 1}. ${path.from_role} → ${path.to_role} at ${path.target_company}
+                        </h4>
+                        
+                        <div class="grid md:grid-cols-4 gap-4 mb-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600">${(path.success_probability * 100).toFixed(0)}%</div>
+                                <div class="text-sm text-gray-600">Success Rate</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">${path.difficulty}</div>
+                                <div class="text-sm text-gray-600">Difficulty</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-600">${path.timeline_months}mo</div>
+                                <div class="text-sm text-gray-600">Timeline</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-orange-600">${path.salary_change}</div>
+                                <div class="text-sm text-gray-600">Salary Impact</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-bold text-gray-800 mb-2">✅ Transferable Skills</h5>
+                                <div class="flex flex-wrap gap-2">
+                                    ${path.transferable_skills.map(skill => 
+                                        `<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${skill}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-gray-800 mb-2">⚠️ Skill Gaps</h5>
+                                <div class="flex flex-wrap gap-2">
+                                    ${path.skill_gaps.map(gap => 
+                                        `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">${gap}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-4 bg-white rounded-lg">
+                            <h5 class="font-bold text-gray-800 mb-2">🎯 Strategic Approach</h5>
+                            <p class="text-gray-700 text-sm mb-2"><strong>Networking:</strong> ${path.networking_strategy}</p>
+                            <div class="flex flex-wrap gap-2">
+                                ${path.success_factors.map(factor => 
+                                    `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">🚀 ${factor}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+        }
+
+        function hideAllResultSections() {
+            document.getElementById('success-metrics').classList.add('hidden');
+            document.getElementById('transition-intelligence').classList.add('hidden');
+            document.getElementById('precision-applications').classList.add('hidden');
+            document.getElementById('execution-plan').classList.add('hidden');
+            document.getElementById('competitive-advantages').classList.add('hidden');
+            document.getElementById('transition-paths-results').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

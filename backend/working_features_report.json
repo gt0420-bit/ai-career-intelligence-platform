@@ -1,0 +1,63 @@
+{
+  "test_timestamp": "2025-08-16T03:01:37.282493",
+  "test_duration": 6.662382125854492,
+  "test_results": {
+    "imports": {
+      "openai": {
+        "available": true,
+        "configured": false
+      },
+      "chromadb": {
+        "available": true
+      },
+      "langchain": {
+        "available": true
+      },
+      "crewai": {
+        "available": true
+      },
+      "llamaindex": {
+        "available": true
+      }
+    },
+    "vector_db": {
+      "success": true,
+      "stats": {
+        "chromadb_available": true,
+        "openai_available": true,
+        "database_initialized": true,
+        "total_applications_loaded": 266,
+        "collections": {
+          "applications": 50,
+          "companies": 0,
+          "skills": 0
+        },
+        "database_path": "./career_vector_db"
+      },
+      "search_results": 3,
+      "response_time": 0.27410387992858887,
+      "success_rate": 0.0
+    },
+    "openai": {
+      "success": false,
+      "error": "No API key"
+    },
+    "database": {
+      "success": true,
+      "total_applications": 266,
+      "successful_applications": 0,
+      "success_rate": 0.0,
+      "recent_count": 5
+    },
+    "ai_core": {
+      "success": false,
+      "error": "'AICore' object has no attribute 'analyze_job_match'"
+    }
+  },
+  "assessment": {
+    "available_components": 5,
+    "working_features": 6,
+    "success_rate": 0.5,
+    "recommendation": "limited"
+  }
+}
